@@ -1,0 +1,14 @@
+{
+  "name": "Zmindset",
+  "short_name": "Zmindset",
+  "description": "A focused workspace for building better habits.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/zmindset-logo.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+
