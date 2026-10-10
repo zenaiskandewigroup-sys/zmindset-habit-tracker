@@ -46,13 +46,28 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
     }
     resetError()
     setBusy(true)
-    const { error: authError } = await createClient().auth.signInWithOtp({
+    const request = createClient().auth.signInWithOtp({
       email: normalizedEmail,
       options: { shouldCreateUser: true },
     })
+    const result = await Promise.race([
+      request,
+      new Promise<{ error: { message: string } }>((resolve) =>
+        window.setTimeout(() => resolve({ error: { message: 'timeout' } }), 15000),
+      ),
+    ])
     setBusy(false)
-    if (authError) {
-      setError('Unable to send a verification code. Please try again.')
+    if (result.error) {
+      const message = result.error.message.toLowerCase()
+      if (message.includes('unsupported provider') || message.includes('provider is not enabled')) {
+        setError('Email OTP belum aktif di Supabase Auth. Admin perlu mengaktifkan Email provider dan SMTP production terlebih dahulu.')
+      } else if (message.includes('rate limit')) {
+        setError('Terlalu banyak permintaan. Tunggu beberapa menit lalu coba lagi.')
+      } else if (message === 'timeout') {
+        setError('Permintaan terlalu lama. Periksa koneksi dan konfigurasi SMTP, lalu coba lagi.')
+      } else {
+        setError('Kode belum terkirim. Periksa konfigurasi email atau coba lagi nanti.')
+      }
       return
     }
     setEmail(normalizedEmail)
