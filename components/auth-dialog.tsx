@@ -48,7 +48,10 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
     setBusy(true)
     const request = createClient().auth.signInWithOtp({
       email: normalizedEmail,
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
     const result = await Promise.race([
       request,
